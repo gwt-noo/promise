@@ -1,0 +1,30 @@
+apply plugin: 'java'
+apply plugin: 'gwt'
+
+version = '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+gwt {
+    gwtVersion = project.ext.gwtVersion
+    minHeapSize = "512M";
+    maxHeapSize = "1024M";
+}
+
+dependencies {
+    compile libraries.gwt_user
+    compile libraries.gwt_elemental
+    testCompile libraries.gwt_jasmine
+    testCompile libraries.junit
+
+    gwtSdk libraries.gwt_user
+    gwtSdk libraries.gwt_dev
+}
+
+task runTestServer(type: de.richsource.gradle.plugins.gwt.GwtSuperDev) {
+    modules += 'noo.promisetest.PromiseTest'
+    src += files(sourceSets.test.allJava.srcDirs)
+    classpath  += sourceSets.test.runtimeClasspath
+}
