@@ -25,9 +25,9 @@
     <orderEntry type="library" exported="" name="Gradle: com.google.gwt:gwt-elemental:2.7.0-rc1" level="project" />
     <orderEntry type="library" exported="" name="Gradle: javax.validation:validation-api:1.0.0.GA" level="project" />
     <orderEntry type="library" exported="" scope="RUNTIME" name="Gradle: com.google.gwt:gwt-servlet:2.7.0-rc1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: com.github.talshani:jasmine-gwt-wrapper:0.1.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: junit:junit:4.11" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.hamcrest:hamcrest-core:1.3" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: com.github.gwt-noo:jasmine-gwt-wrapper:0.1.3" level="project" />
     <orderEntry type="library" exported="" name="Gradle: javax.validation:validation-api:1.0.0.GA" level="project" />
   </component>
 </module>

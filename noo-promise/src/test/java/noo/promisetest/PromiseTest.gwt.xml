@@ -4,7 +4,7 @@
 
     <inherits name='com.google.gwt.user.User'/>
     <inherits name='noo.promise.Promise'/>
-    <inherits name='com.github.talshani.jasmine.Jasmine'/>
+    <inherits name='noo.testing.jasmine.Jasmine'/>
 
     <source path=""/>
 

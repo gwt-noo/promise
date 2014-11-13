@@ -1,14 +1,14 @@
 package noo.promisetest;
 
-import com.github.talshani.jasmine.client.DescribeCallback;
-import com.github.talshani.jasmine.client.DoneCallback;
-import com.github.talshani.jasmine.client.JasmineCallback;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.user.client.Command;
 import noo.promise.*;
+import noo.testing.jasmine.client.DescribeCallback;
+import noo.testing.jasmine.client.DoneCallback;
+import noo.testing.jasmine.client.JasmineCallback;
 
-import static com.github.talshani.jasmine.client.Jasmine.*;
+import static noo.testing.jasmine.client.Jasmine.*;
 
 /**
  * @author Tal Shani
