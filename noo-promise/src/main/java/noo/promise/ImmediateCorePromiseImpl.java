@@ -31,7 +31,7 @@ class ImmediateCorePromiseImpl extends ImmediateCore {
       promise.then($entry(function () {
         if(!ar[id]) {
           @noo.promise.ImmediateCorePromiseImpl::executedId = Math.max(@noo.promise.ImmediateCorePromiseImpl::executedId, id);
-          command.@com.google.gwt.user.client.Command::execute()();
+          command.@noo.promise.ImmediateCommand::execute()();
         }
         delete ar[id];
       }));

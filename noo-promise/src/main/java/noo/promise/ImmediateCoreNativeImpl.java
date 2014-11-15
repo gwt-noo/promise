@@ -14,7 +14,7 @@ class ImmediateCoreNativeImpl extends ImmediateCore {
     final native int setImmediate(final ImmediateCommand command) /*-{
       var cmd = command;
       var id = Window.prototype.setImmediate.call(window, $entry(function() {
-        cmd.@com.google.gwt.user.client.Command::execute()();
+        cmd.@noo.promise.ImmediateCommand::execute()();
       }));
       return id;
     }-*/;
