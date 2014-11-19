@@ -29,7 +29,7 @@ class ImmediateCorePostMessageBase extends ImmediateCoreEmulatedBase {
 
     ImmediateCorePostMessageBase(Window window) {
         this.window = window;
-        window.addEventListener("message", new Listener(), true);
+        window.addEventListener("message", new Listener(), false);
     }
 
     @Override
@@ -39,11 +39,11 @@ class ImmediateCorePostMessageBase extends ImmediateCoreEmulatedBase {
         // * http://www.whatwg.org/specs/web-apps/current-work/multipage/comms.html#crossDocumentMessages
 
         int handle = addCommand(command);
-        window.postMessage(messagePrefix + handle, "*", null);
+        window.postMessage(messagePrefix + handle, "*");
         return handle;
     }
 
-    private native boolean eventValid(Object o, String messagePrefix) /*-{
+    private native boolean eventValid(Object event, String messagePrefix) /*-{
       return typeof event.data === "string" && event.data.indexOf(messagePrefix) === 0
     }-*/;
 
