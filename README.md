@@ -7,7 +7,9 @@ A minimal promise library for GWT that wraps the native promise if exists, or em
 Running the test server
 =======================
 You can execute a test server that will help development. In a shell execute
-```gradlew runTestServer```
+```Shell
+gradlew runTestServer
+```
 
 This will start the SuperDevMode including the test sources.
 

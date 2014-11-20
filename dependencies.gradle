@@ -9,9 +9,13 @@ allprojects {
     project.ext.gwtVersion = gwtVersion
 
     repositories {
+        mavenLocal()
         mavenCentral()
         maven {
             url "http://dl.bintray.com/gwt-noo/maven"
+        }
+        maven {
+            url "https://repository-saucelabs.forge.cloudbees.com/release"
         }
     }
 
@@ -26,9 +30,11 @@ allprojects {
             'guava-gwt'     : [group: 'com.google.guava', name: 'guava-gwt', version: '15.0'],
             'gwtquery'      : [group: 'com.googlecode.gwtquery', name: 'gwtquery', version: '1.4.0'],
             'eventbinder'   : [group: 'com.google.gwt.eventbinder', name: 'eventbinder', version: '1.0.1'],
-            'gwt_jasmine'   : [group: 'com.github.gwt-noo', name: 'jasmine-gwt-wrapper', version: '0.1.3'],
+
+            'gwt_jasmine'   : [group: 'com.github.gwt-noo', name: 'jasmine-gwt-wrapper', version: '0.1.5'],
 
 
             'junit'         : [group: 'junit', name: 'junit', version: '4.11'],
+            'ci_sauce'         : [group: 'com.saucelabs', name: 'ci-sauce', version: '1.83'],
     ];
 }
