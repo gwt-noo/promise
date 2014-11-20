@@ -1,7 +1,7 @@
 // managed dependencies for easier access
 
 
-def gwtVersion = '2.7.0-rc1'
+def gwtVersion = '2.7.0'
 
 
 
