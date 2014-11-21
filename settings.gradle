@@ -1,3 +1,5 @@
+rootProject.name = "noo-promise-root"
+
 include 'noo-promise'
 include 'example'
 

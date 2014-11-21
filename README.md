@@ -3,6 +3,7 @@ noo-promise
 
 A minimal promise library for GWT that wraps the native promise if exists, or emulate promises using immediates
 
+[![Sauce Test Status](https://saucelabs.com/browser-matrix/promise.svg)](https://saucelabs.com/u/promise)
 
 Running the test server
 =======================

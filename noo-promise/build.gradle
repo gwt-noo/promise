@@ -23,8 +23,19 @@ dependencies {
     gwtSdk libraries.gwt_dev
 }
 
-task runTestServer(type: de.richsource.gradle.plugins.gwt.GwtSuperDev) {
+task runTestServer(
+        description: "Runs super dev mode with the test module for easy local testing",
+        type: de.richsource.gradle.plugins.gwt.GwtSuperDev) {
     modules += 'noo.promisetest.PromiseTest'
     src += files(sourceSets.test.allJava.srcDirs)
     classpath  += sourceSets.test.runtimeClasspath
+}
+
+task compileTestModule(
+        description: "Compiles the test module for static testing",
+        type: de.richsource.gradle.plugins.gwt.GwtCompile) {
+    modules += 'noo.promisetest.PromiseTest'
+    src += files(sourceSets.test.allJava.srcDirs)
+    classpath  += sourceSets.test.runtimeClasspath
+    war = file("$buildDir/testWar")
 }
