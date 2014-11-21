@@ -37,6 +37,7 @@ githubPages {
         from (project(":noo-promise").buildDir.path + "/testWar") {
             exclude "WEB-INF"
         }
+        from "pages"
     }
 }
 
