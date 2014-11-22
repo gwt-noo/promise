@@ -2,7 +2,6 @@ package noo.promisetest;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.user.client.Command;
 import noo.promise.*;
 import noo.testing.jasmine.client.DescribeCallback;
 import noo.testing.jasmine.client.DoneCallback;
@@ -19,45 +18,40 @@ public class TestEntry implements EntryPoint {
 
         describe("promises", new DescribeCallback() {
 
-            int currentPos = 0;
-
             @Override
             protected void doDescribe() {
 
                 it("should run in a specific order", new JasmineCallback() {
                     @Override
                     public void define(final DoneCallback done) {
-                        assertPos(0);
+                        final PositionAssertion asserter = new PositionAssertion(5, done);
+                        asserter.pos(0);
                         Promise<Object> promise = Promises.create(new PromiseResolver<Object>() {
                             @Override
                             public void resolve(PromiseCallback<Object> callback) {
-                                assertPos(1);
+                                asserter.pos(1);
                                 callback.resolveValue(null);
                             }
                         });
-                        assertPos(2);
+                        asserter.pos(2);
                         promise.then(new PromiseHandler<Object, Object>() {
                             @Override
                             protected PromiseOrValue<Object> onFulfilled(Object value) {
-                                assertPos(5);
+                                asserter.pos(5);
                                 return super.onFulfilled(value);
                             }
                         });
-                        assertPos(3);
-                        Scheduler.get().scheduleFinally(new Command() {
+                        asserter.pos(3);
+
+                        Scheduler.get().scheduleFinally(new Scheduler.RepeatingCommand() {
                             @Override
-                            public void execute() {
-                                assertPos(4);
-                                done.execute();
+                            public boolean execute() {
+                                asserter.pos(4);
+                                return false;
                             }
                         });
                     }
                 });
-            }
-
-            void assertPos(int pos) {
-                expect(pos).toBe(currentPos);
-                currentPos++;
             }
         });
 
@@ -67,34 +61,53 @@ public class TestEntry implements EntryPoint {
             @Override
             protected void doDescribe() {
                 it("should run in a specific order", new JasmineCallback() {
-                    int currentPos = 0;
-
                     @Override
                     public void define(final DoneCallback done) {
-                        assertPos(0);
+                        final PositionAssertion asserter = new PositionAssertion(4, done);
+                        asserter.pos(0);
                         Immediate.setImmediate(new ImmediateCommand() {
                             @Override
                             public void execute() {
-                                assertPos(3);
+                                asserter.pos(3);
                                 done.execute();
                             }
                         });
-                        assertPos(1);
-                        Scheduler.get().scheduleFinally(new Command() {
+                        asserter.pos(1);
+                        Scheduler.get().scheduleFinally(new Scheduler.RepeatingCommand() {
                             @Override
-                            public void execute() {
-                                assertPos(2);
+                            public boolean execute() {
+                                asserter.pos(2);
+                                return false;
                             }
                         });
-                    }
-
-                    void assertPos(int pos) {
-                        expect(pos).toBe(currentPos);
-                        currentPos++;
                     }
                 });
 
             }
         });
+    }
+
+
+    static class PositionAssertion {
+        private final DoneCallback done;
+        private final int total;
+        private int currentPos = 0;
+
+        PositionAssertion(int total, DoneCallback done) {
+            this.done = done;
+            this.total = total;
+        }
+
+        public void pos(int pos) {
+            expect(pos).toBe(currentPos);
+            currentPos++;
+            if (currentPos == total) {
+                done.execute();
+            }
+            if (currentPos > total) {
+                String message = "Too many position assertions: " + currentPos + " expected " + total;
+                throw new RuntimeException(message);
+            }
+        }
     }
 }
