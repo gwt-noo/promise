@@ -7,3 +7,7 @@ gradle-app.setting
 # IDE files
 .idea
 *.iml
+
+
+saucetests/node_modules
+saucetests/*.log

@@ -15,5 +15,7 @@ gradlew runTestServer
 This will start the SuperDevMode including the test sources.
 
 Navigate to
+```
 http://localhost:9876/noo.promisetest.PromiseTest/jasmine/runner.html
+```
 and see the passing tests
