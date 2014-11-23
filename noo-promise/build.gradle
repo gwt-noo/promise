@@ -1,5 +1,8 @@
 apply plugin: 'java'
 apply plugin: 'gwt'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'maven'
 
 version = '1.0'
 
@@ -14,6 +17,10 @@ gwt {
     gwtVersion = project.ext.gwtVersion
     minHeapSize = "512M";
     maxHeapSize = "1024M";
+}
+
+jar {
+    from sourceSets.main.allSource
 }
 
 dependencies {
@@ -41,3 +48,43 @@ task compileTestModule(
     classpath  += sourceSets.test.runtimeClasspath
     war = file("$buildDir/testWar")
 }
+
+
+group = 'com.github.gwt-noo'
+def versionBase = '0.1.0'
+version = versionBase //+ (project.hasProperty('release') ? '' : '-test')
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            name = 'GWT noo repository'
+            repository(id: 'gwt-noo', url: 'https://api.bintray.com/maven/gwt-noo/maven/noo-promise') {
+                authentication(userName: bintrayUser, password: bintrayKey)
+            }
+        }
+    }
+}
+
+bintray {
+    user = bintrayUser
+    key = bintrayKey
+    publications = ['mavenJava'] // see publications closure
+    publish = true
+    pkg { //package will be created if does not exist
+        repo = 'maven'
+        userOrg = 'gwt-noo'
+        name = 'noo-promise'
+        desc = 'A promise library for GWT'
+        licenses = ['Apache-2.0']
+        labels = ['gwt', 'promise']
+    }
+}
+bintrayUpload.dependsOn assemble

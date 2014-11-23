@@ -19,3 +19,36 @@ Navigate to
 http://localhost:9876/noo.promisetest.PromiseTest/jasmine/runner.html
 ```
 and see the passing tests
+
+# Building and deploying
+
+Just run
+```Shell
+gradlew :noo-promise:bintrayUpload
+```
+
+# Maven / Gradle
+
+The repository is located at
+```
+http://dl.bintray.com/gwt-noo/maven
+```
+
+Artifact
+```
+<dependency>
+        <groupId>com.github.gwt-noo</groupId>
+        <artifactId>noo-promise</artifactId>
+        <version>VERSION</version>
+        <type>jar</type>
+</dependency>
+```
+or
+```
+compile(group: 'com.github.gwt-noo', name: 'noo-promise', version: 'VERSION')
+```
+
+# Change log
+
+## 0.1.0
+ - Initial version
