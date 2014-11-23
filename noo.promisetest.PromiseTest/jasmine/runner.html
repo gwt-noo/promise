@@ -23,32 +23,26 @@
 <body>
 
 <div id="unit"></div>
-<a href="javascript:recompile()"
-   style="color: black; font-size: 12pt; font-family: sans; text-decoration: none; border: 2px outset rgb(221, 221, 221); padding: 3pt; background: rgb(221, 221, 221);">Compile</a>
 <script>
     (function () {
-        var moduleName = /([^\/]+)\/jasmine\/runner.html/.exec(location.href)[1];
-        var basePath = /[^\/]+\/\/[^\/]+(\/.+\/)jasmine\/runner.html/.exec(location.href)[1];
-        var scriptPath = basePath + moduleName + '.nocache.js';
+        var m = /^(.+\/)([^\/]+)\/jasmine\/runner.html[#?]?/.exec(location.href);
+        var moduleName = m[2];
+        var basePath = m[1];
+        injectScript(basePath + "recompile-requester/" + moduleName);
+        // if we are not on SDM, we should inject the normal script
+        setTimeout(function() {
+            if(!window['__gwt_sdm']) {
+                injectScript(basePath + moduleName + "/" + moduleName + ".nocache.js");
+            }
+        }, 500)
+    })();
 
-        window.__gwt_bookmarklet_params = {
-            server_url: 'http://localhost:9876/',
-            module_name: moduleName
-        };
-
-
+    function injectScript(url) {
         var script = document.createElement('script');
-        script.src = scriptPath;
+        script.src = url;
         script.type = 'text/javascript';
         script.language = 'javascript';
         document.head.appendChild(script);
-    })();
-
-
-    function recompile() {
-        var s = document.createElement('script');
-        s.src = 'http://localhost:9876/dev_mode_on.js';
-        void(document.getElementsByTagName('head')[0].appendChild(s));
     }
 
 </script>
