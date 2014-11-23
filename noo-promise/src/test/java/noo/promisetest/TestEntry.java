@@ -60,16 +60,28 @@ public class TestEntry implements EntryPoint {
 
             @Override
             protected void doDescribe() {
+
+                it("should work", new JasmineCallback() {
+                    @Override
+                    public void define(final DoneCallback done) {
+                        Immediate.setImmediate(new ImmediateCommand() {
+                            @Override
+                            public void execute() {
+                                done.execute();
+                            }
+                        });
+                    }
+                });
+
                 it("should run in a specific order", new JasmineCallback() {
                     @Override
                     public void define(final DoneCallback done) {
-                        final PositionAssertion asserter = new PositionAssertion(4, done);
+                        final PositionAssertion asserter = new PositionAssertion(3, done);
                         asserter.pos(0);
                         Immediate.setImmediate(new ImmediateCommand() {
                             @Override
                             public void execute() {
                                 asserter.pos(3);
-                                done.execute();
                             }
                         });
                         asserter.pos(1);
@@ -101,10 +113,10 @@ public class TestEntry implements EntryPoint {
         public void pos(int pos) {
             expect(pos).toBe(currentPos);
             currentPos++;
-            if (currentPos == total) {
+            if (pos == total) {
                 done.execute();
             }
-            if (currentPos > total) {
+            if (pos > total) {
                 String message = "Too many position assertions: " + currentPos + " expected " + total;
                 throw new RuntimeException(message);
             }

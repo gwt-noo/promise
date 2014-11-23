@@ -1,22 +1,18 @@
 package noo.promise;
 
-import elemental.client.Browser;
-import elemental.dom.Document;
-import elemental.html.IFrameElement;
-import elemental.html.Window;
+import com.google.gwt.core.client.JavaScriptObject;
 
 /**
  * @author Tal Shani
  */
 class ImmediateCorePostMessageIframeImpl extends ImmediateCorePostMessageBase {
 
-    private static Window getWindow() {
-        Document doc = Browser.getDocument();
-        IFrameElement iframe = doc.createIFrameElement();
-        iframe.setSrc("javascript:void 0;");
-        doc.getBody().appendChild(iframe);
-        return iframe.getContentWindow();
-    }
+    private static native JavaScriptObject getWindow() /*-{
+        var iframe = $doc.createElement('iframe');
+        iframe.src = "javascript:void 0;";
+        $doc.body.appendChild(iframe)
+        return iframe.contentWindow;
+    }-*/;
 
     ImmediateCorePostMessageIframeImpl() {
         super(getWindow());

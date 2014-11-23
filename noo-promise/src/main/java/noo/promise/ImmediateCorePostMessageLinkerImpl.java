@@ -1,13 +1,13 @@
 package noo.promise;
 
-import elemental.html.Window;
+import com.google.gwt.core.client.JavaScriptObject;
 
 /**
  * @author Tal Shani
  */
 class ImmediateCorePostMessageLinkerImpl extends ImmediateCorePostMessageBase {
-    private native static Window getWindow() /*-{
-      return window;
+    private native static JavaScriptObject getWindow() /*-{
+        return window;
     }-*/;
 
     ImmediateCorePostMessageLinkerImpl() {

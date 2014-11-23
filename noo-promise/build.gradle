@@ -3,6 +3,9 @@ apply plugin: 'gwt'
 
 version = '1.0'
 
+sourceCompatibility = JavaVersion.VERSION_1_7
+targetCompatibility = JavaVersion.VERSION_1_7
+
 repositories {
     mavenCentral()
 }

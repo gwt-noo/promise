@@ -1,35 +1,19 @@
 package noo.promise;
 
-import elemental.events.Event;
-import elemental.events.EventListener;
-import elemental.events.MessageEvent;
-import elemental.html.Window;
+import com.google.gwt.core.client.JavaScriptObject;
 
 /**
  * @author Tal Shani
  */
 class ImmediateCorePostMessageBase extends ImmediateCoreEmulatedBase {
-
-    class Listener implements EventListener {
-
-        @Override
-        public void handleEvent(Event evt) {
-            MessageEvent event = (MessageEvent) evt;
-            if (event.getSource() == window && eventValid(event, messagePrefix)) {
-                String data = (String) event.getData();
-                runIfPresent(Integer.parseInt(data.substring(prefixLength)));
-            }
-        }
-    }
-
-    private final String messagePrefix = "setImmediate$" + Math.random() + "$";
-    private final int prefixLength = messagePrefix.length();
+    private final static String MESSAGE_PREFIX = "setImmediate$" + Math.random() + "$";
+    private final static int PREFIX_LENGTH = MESSAGE_PREFIX.length();
     //    private final Window window = Browser.getWindow();
-    private final Window window;
+    private final JavaScriptObject window;
 
-    ImmediateCorePostMessageBase(Window window) {
+    ImmediateCorePostMessageBase(JavaScriptObject window) {
         this.window = window;
-        window.addEventListener("message", new Listener(), false);
+        addEventListener(window, MESSAGE_PREFIX);
     }
 
     @Override
@@ -39,16 +23,30 @@ class ImmediateCorePostMessageBase extends ImmediateCoreEmulatedBase {
         // * http://www.whatwg.org/specs/web-apps/current-work/multipage/comms.html#crossDocumentMessages
 
         int handle = addCommand(command);
-        window.postMessage(messagePrefix + handle, "*");
+        postMessage(window, MESSAGE_PREFIX + handle);
         return handle;
     }
-
-    private native boolean eventValid(Object event, String messagePrefix) /*-{
-      return typeof event.data === "string" && event.data.indexOf(messagePrefix) === 0
-    }-*/;
 
     @Override
     String getImplementationName() {
         return super.getImplementationName() + ":post message";
+    }
+
+    private native void addEventListener(JavaScriptObject window, String messagePrefix) /*-{
+        var instance = this;
+        window.addEventListener('message', $entry(function (event) {
+            if (typeof event.data === "string" && event.data.indexOf(messagePrefix) === 0) {
+                instance.@noo.promise.ImmediateCorePostMessageBase::runIfPresent(Ljava/lang/String;)(event.data);
+            }
+        }))
+    }-*/;
+
+    private native static void postMessage(JavaScriptObject window, String message) /*-{
+        window.postMessage(message, "*");
+    }-*/;
+
+
+    private void runIfPresent(String handle) {
+        runIfPresent(Integer.parseInt(handle.substring(PREFIX_LENGTH)));
     }
 }

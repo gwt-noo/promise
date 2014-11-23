@@ -1,16 +1,15 @@
 package noo.promise;
 
-import elemental.client.Browser;
-import elemental.html.Window;
+import com.google.gwt.core.client.JavaScriptObject;
 
 /**
  * @author Tal Shani
  */
 class ImmediateCorePostMessageHostImpl extends ImmediateCorePostMessageBase {
 
-    private static Window getWindow() {
-        return Browser.getWindow();
-    }
+    private static native JavaScriptObject getWindow() /*-{
+        return $wnd;
+    }-*/;
 
     ImmediateCorePostMessageHostImpl() {
         super(getWindow());

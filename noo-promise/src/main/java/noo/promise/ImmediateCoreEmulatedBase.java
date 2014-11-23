@@ -1,8 +1,6 @@
 package noo.promise;
 
-import elemental.client.Browser;
-import elemental.dom.TimeoutHandler;
-import elemental.js.util.JsMapFromIntTo;
+import com.google.gwt.core.client.JavaScriptObject;
 
 /**
  * @author Tal Shani
@@ -11,12 +9,20 @@ abstract class ImmediateCoreEmulatedBase extends ImmediateCore {
 
     private int nextHandle = 1;
     private boolean currentlyRunningATask = false;
-    private JsMapFromIntTo<ImmediateCommand> tasksByHandle = JsMapFromIntTo.create();
+    private JavaScriptObject tasksByHandle = JavaScriptObject.createObject();
 
     int addCommand(ImmediateCommand command) {
-        tasksByHandle.put(nextHandle, command);
+        setCommand_(tasksByHandle, nextHandle, command);
         return nextHandle++;
     }
+
+    private static native void setCommand_(JavaScriptObject map, int key, ImmediateCommand value) /*-{
+        map[key] = value;
+    }-*/;
+
+    private static native ImmediateCommand getCommand_(JavaScriptObject map, int key) /*-{
+        return map[key];
+    }-*/;
 
     void runIfPresent(final int handle) {
         // From the spec: "Wait until any invocations of this algorithm started before this one have completed."
@@ -24,14 +30,9 @@ abstract class ImmediateCoreEmulatedBase extends ImmediateCore {
         if (currentlyRunningATask) {
             // Delay by doing a setTimeout. setImmediate was tried instead, but in Firefox 7 it generated a
             // "too much recursion" error.
-            Browser.getWindow().setTimeout(new TimeoutHandler() {
-                @Override
-                public void onTimeoutHandler() {
-                    runIfPresent(handle);
-                }
-            }, 0);
+            delayRunIfPresent(this, handle);
         } else {
-            ImmediateCommand task = tasksByHandle.get(handle);
+            ImmediateCommand task = getCommand_(tasksByHandle, handle);
             if (task != null) {
                 currentlyRunningATask = true;
                 try {
@@ -46,7 +47,7 @@ abstract class ImmediateCoreEmulatedBase extends ImmediateCore {
 
     @Override
     void clearImmediate(int handle) {
-        tasksByHandle.put(handle, null);
+        setCommand_(tasksByHandle, handle, null);
     }
 
     abstract int setImmediate(ImmediateCommand command);
@@ -55,4 +56,10 @@ abstract class ImmediateCoreEmulatedBase extends ImmediateCore {
     String getImplementationName() {
         return "emulated";
     }
+
+    private static native void delayRunIfPresent(ImmediateCoreEmulatedBase instance, int handle) /*-{
+        setTimeout($entry(function () {
+            instance.@noo.promise.ImmediateCoreEmulatedBase::runIfPresent(I)(handle);
+        }))
+    }-*/;
 }

@@ -16,7 +16,7 @@
     Define which window to use to post messages for immediate simulation
     -->
     <define-property name="$noo.immediate.postMessageWindow" values="host, linker, iframe"/>
-    <set-property name="$noo.immediate.postMessageWindow" value="linker"/>
+    <set-property name="$noo.immediate.postMessageWindow" value="host"/>
 
 
     <replace-with class="noo.promise.ImmediateCoreNativeImpl">
