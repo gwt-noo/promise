@@ -3,7 +3,6 @@
 <module>
 
     <inherits name='com.google.gwt.core.Core'/>
-    <inherits name='elemental.Elemental'/>
 
     <source path="">
         <exclude name="test"/>

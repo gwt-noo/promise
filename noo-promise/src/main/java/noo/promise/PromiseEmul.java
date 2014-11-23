@@ -1,6 +1,6 @@
 package noo.promise;
 
-import elemental.js.util.JsArrayOf;
+import com.google.gwt.core.client.JavaScriptObject;
 
 /**
  * @author Tal Shani
@@ -46,7 +46,7 @@ public class PromiseEmul<T> implements Promise<T> {
 
     private Exception reason = null;
     private STATE state = STATE.PENDING;
-    private JsArrayOf<PromiseHandler<?, T>> subscribers = JsArrayOf.create();
+    private HandlersCollection<T> subscribers = HandlersCollection.create();
     private T value = null;
 
 
@@ -190,5 +190,28 @@ public class PromiseEmul<T> implements Promise<T> {
 
     static enum STATE {
         PENDING, FULFILLED, REJECTED;
+    }
+
+    static final class HandlersCollection<T> extends JavaScriptObject {
+
+        protected HandlersCollection() {
+        }
+
+
+        public static <T> HandlersCollection<T> create() {
+            return JavaScriptObject.createArray().cast();
+        }
+
+        public native int length() /*-{
+            return this.length;
+        }-*/;
+
+        public native PromiseHandler<?, T> get(int i) /*-{
+            return this[i];
+        }-*/;
+
+        public native void push(PromiseHandler<?, T> handler) /*-{
+            this[this.length] = handler;
+        }-*/;
     }
 }

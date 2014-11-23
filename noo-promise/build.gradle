@@ -18,7 +18,6 @@ gwt {
 
 dependencies {
     compile libraries.gwt_user
-    compile libraries.gwt_elemental
     testCompile libraries.gwt_jasmine
     testCompile libraries.junit
 
