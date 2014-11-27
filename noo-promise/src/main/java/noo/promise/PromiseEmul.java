@@ -12,7 +12,7 @@ public class PromiseEmul<T> implements Promise<T> {
         private boolean done = false;
 
         @Override
-        public void reject(Exception reason) {
+        public void reject(Throwable reason) {
             if (!done) {
                 done = true;
                 PromiseEmul.this.reject(reason);
@@ -44,51 +44,90 @@ public class PromiseEmul<T> implements Promise<T> {
         }
     }
 
-    private Exception reason = null;
+    private Throwable reason = null;
     private STATE state = STATE.PENDING;
-    private HandlersCollection<T> subscribers = HandlersCollection.create();
+    private HandlersCollection<T> successSubscribers = HandlersCollection.create();
+    private HandlersCollection<Throwable> errorSubscribers = HandlersCollection.create();
     private T value = null;
+    private final PromiseLoggingHelper logger = new PromiseLoggingHelper();
 
 
     public PromiseEmul(PromiseResolver<T> resolver) {
         doResolve(resolver);
     }
 
-    public void done(final PromiseHandler<?, T> handler) {
-        // when we are done, we must do it async
-
-        Immediate.setImmediate(new ImmediateCommand() {
+    @Override
+    public Promise<T> then(final PromiseHandler<T> onFulfilled) {
+        logger.enterThen(onFulfilled);
+        return new PromiseEmul<T>(new PromiseResolver<T>() {
             @Override
-            public void execute() {
-
-                handle(handler);
+            public void resolve(final PromiseCallback<T> callback) {
+                handle(new PromiseHandler<T>() {
+                    @Override
+                    public void handle(T value) {
+                        logger.callingThenHandler(onFulfilled);
+                        callback.resolveValue(value);
+                        onFulfilled.handle(value);
+                    }
+                }, null);
             }
         });
     }
 
-    public <R> Promise<R> then(final PromiseHandler<R, T> handler) {
+    @Override
+    public Promise<T> catchIt(final PromiseHandler<Throwable> onRejected) {
+        logger.enterCatch(onRejected);
+        return new PromiseEmul<T>(new PromiseResolver<T>() {
+            @Override
+            public void resolve(final PromiseCallback<T> callback) {
+                handle(null, new PromiseRejectionHandler() {
+                    @Override
+                    public void handle(Throwable value) {
+                        logger.callingCatchHandler(onRejected);
+                        onRejected.handle(value);
+                        callback.reject(value);
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
+    public <R> Promise<R> then(final PromiseTransformingHandler<R, T> onFulfilled) {
+        logger.enterThen(onFulfilled);
         return new PromiseEmul<R>(new PromiseResolver<R>() {
             @Override
             public void resolve(final PromiseCallback<R> callback) {
-                done(new PromiseHandler<Void, T>() {
+                handle(new PromiseHandler<T>() {
                     @Override
-                    protected PromiseOrValue<Void> onRejected(Exception reason) {
+                    public void handle(T value) {
                         try {
-                            callback.resolve(handler.onRejected(reason));
-                        } catch (Exception e) {
-                            callback.reject(e);
+                            logger.callingThenHandler(onFulfilled);
+                            callback.resolve(onFulfilled.handle(value));
+                        } catch (Throwable t) {
+                            callback.reject(t);
                         }
-                        return null;
                     }
+                }, null);
+            }
+        });
+    }
 
+    @Override
+    public <R> Promise<R> catchIt(final PromiseTransformingHandler<R, Throwable> onRejected) {
+        logger.enterCatch(onRejected);
+        return new PromiseEmul<R>(new PromiseResolver<R>() {
+            @Override
+            public void resolve(final PromiseCallback<R> callback) {
+                handle(null, new PromiseRejectionHandler() {
                     @Override
-                    protected PromiseOrValue<Void> onFulfilled(T value) {
+                    public void handle(Throwable value) {
                         try {
-                            callback.resolve(handler.onFulfilled(value));
-                        } catch (Exception e) {
-                            callback.reject(e);
+                            logger.callingCatchHandler(onRejected);
+                            callback.resolve(onRejected.handle(value));
+                        } catch (Throwable t) {
+                            callback.reject(t);
                         }
-                        return null;
                     }
                 });
             }
@@ -105,17 +144,15 @@ public class PromiseEmul<T> implements Promise<T> {
         return new PromiseResolver<T>() {
             @Override
             public void resolve(final PromiseCallback<T> callback) {
-                promise.then(new PromiseHandler<Object, T>() {
+                promise.then(new PromiseHandler<T>() {
                     @Override
-                    protected PromiseOrValue<Object> onFulfilled(T value) {
+                    public void handle(T value) {
                         callback.resolveValue(value);
-                        return null;
                     }
-
+                }).catchIt(new PromiseHandler<Throwable>() {
                     @Override
-                    protected PromiseOrValue<Object> onRejected(Exception reason) {
+                    public void handle(Throwable value) {
                         callback.reject(reason);
-                        return null;
                     }
                 });
             }
@@ -123,18 +160,32 @@ public class PromiseEmul<T> implements Promise<T> {
     }
 
     private void doResolve(PromiseResolver<T> fn) {
-        fn.resolve(new PromiseCallbackImpl());
+        PromiseCallbackImpl callback = new PromiseCallbackImpl();
+        try {
+            fn.resolve(callback);
+        } catch (Throwable throwable) {
+            callback.reject(throwable);
+        }
     }
 
     private void fireHandlers(STATE state) {
+
         if (state == STATE.PENDING || this.state != STATE.PENDING) return;
         this.state = state;
         // because we changed the state no more subscriber will join the subscribers array
-        int length = subscribers.length();
-        for (int i = 0; i < length; i++) {
-            handle(subscribers.get(i));
+        if (state == STATE.FULFILLED) {
+            int length = successSubscribers.length();
+            for (int i = 0; i < length; i++) {
+                handleFulfilled(successSubscribers.get(i));
+            }
+        } else {
+            int length = errorSubscribers.length();
+            for (int i = 0; i < length; i++) {
+                handleRejected(errorSubscribers.get(i));
+            }
         }
-        subscribers = null;
+        successSubscribers = null;
+        errorSubscribers = null;
     }
 
     private void fulfill(T value) {
@@ -142,17 +193,40 @@ public class PromiseEmul<T> implements Promise<T> {
         fireHandlers(STATE.FULFILLED);
     }
 
-    private void handle(PromiseHandler<?, T> handler) {
+    private void handle(final PromiseHandler<T> onFulfilled, final PromiseHandler<Throwable> onRejected) {
         if (state == STATE.PENDING) {
-            subscribers.push(handler);
+            if (onFulfilled != null) successSubscribers.push(onFulfilled);
+            if (onRejected != null) errorSubscribers.push(onRejected);
         } else if (state == STATE.FULFILLED) {
-            handler.onFulfilled(value);
+            if (onFulfilled != null) {
+                Immediate.setImmediate(new ImmediateCommand() {
+                    @Override
+                    public void execute() {
+                        onFulfilled.handle(value);
+                    }
+                });
+            }
         } else if (state == STATE.REJECTED) {
-            handler.onRejected(reason);
+            if (onRejected != null) {
+                Immediate.setImmediate(new ImmediateCommand() {
+                    @Override
+                    public void execute() {
+                        onRejected.handle(reason);
+                    }
+                });
+            }
         }
     }
 
-    private void reject(Exception reason) {
+    private void handleFulfilled(PromiseHandler<T> handler) {
+        handler.handle(value);
+    }
+
+    private void handleRejected(PromiseHandler<Throwable> handler) {
+        handler.handle(reason);
+    }
+
+    private void reject(Throwable reason) {
         this.reason = reason;
         fireHandlers(STATE.REJECTED);
     }
@@ -206,11 +280,11 @@ public class PromiseEmul<T> implements Promise<T> {
             return this.length;
         }-*/;
 
-        public native PromiseHandler<?, T> get(int i) /*-{
+        public native PromiseHandler<T> get(int i) /*-{
             return this[i];
         }-*/;
 
-        public native void push(PromiseHandler<?, T> handler) /*-{
+        public native void push(PromiseHandler<T> handler) /*-{
             this[this.length] = handler;
         }-*/;
     }

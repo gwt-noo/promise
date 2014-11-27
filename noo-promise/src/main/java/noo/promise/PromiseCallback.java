@@ -10,5 +10,5 @@ public interface PromiseCallback<T> {
 
     void resolvePromise(Promise<T> value);
 
-    void reject(Exception reason);
+    void reject(Throwable reason);
 }

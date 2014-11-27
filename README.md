@@ -50,5 +50,12 @@ compile(group: 'com.github.gwt-noo', name: 'noo-promise', version: 'VERSION')
 
 # Change log
 
+## 0.1.1
+ - Changing the PromiseHandler utility method names to wrap*
+ - Fixing wrapPromise to accept promise
+ - Adding shortcut to just chain on errors with catchIt
+ - Adding a lot of tests
+ - Passing tests in chrome and ie 8 through 11 (checking on 11 emulating 8)
+
 ## 0.1.0
  - Initial version

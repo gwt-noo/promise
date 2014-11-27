@@ -13,4 +13,9 @@ class PromisesCoreNativeImpl extends PromisesCore {
     String getImplementationName() {
         return "native";
     }
+
+    @Override
+    native <T> Promise<T> resolve(T value) /*-{
+        return Promise.resolve(value);
+    }-*/;
 }

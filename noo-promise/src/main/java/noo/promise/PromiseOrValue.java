@@ -9,7 +9,7 @@ public class PromiseOrValue<T> {
     }
 
     static <R> PromiseOrValue<R> value(R value) {
-        return new PromiseOrValue<R>(null, value, true);
+        return new PromiseOrValue<R>(null, value, false);
     }
     private final boolean isPromise;
     private final Promise<T> promise;

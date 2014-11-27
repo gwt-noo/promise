@@ -44,14 +44,20 @@ task compileTestModule(
         description: "Compiles the test module for static testing",
         type: de.richsource.gradle.plugins.gwt.GwtCompile) {
     modules += 'noo.promisetest.PromiseTest'
-    src += files(sourceSets.test.allJava.srcDirs)
+    src += files(sourceSets.test.allSource.srcDirs)
     classpath  += sourceSets.test.runtimeClasspath
+    classpath  += sourceSets.test.compileClasspath
     war = file("$buildDir/testWar")
 }
 
+compileTestModule.dependsOn compileJava
+compileTestModule.dependsOn compileTestJava
+runTestServer.dependsOn compileJava
+runTestServer.dependsOn compileTestJava
+
 
 group = 'com.github.gwt-noo'
-def versionBase = '0.1.0'
+def versionBase = '0.1.1'
 version = versionBase //+ (project.hasProperty('release') ? '' : '-test')
 
 publishing {

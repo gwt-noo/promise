@@ -4,16 +4,16 @@ module.exports = function (grunt) {
     //var request = require('request');
 
     var browsersSpec = {
-        //'firefox': {
-        //    'XP': ['4..33', 'beta', 'dev']
-        //},
+        'firefox': {
+            'XP': ['4..33', 'beta', 'dev']
+        },
         'internet explorer': {
-            'XP': ['6..8'],
-            'Windows 7': ['8..11'],
+            //'XP': ['6..8'],
+            'Windows 7': ['10..9'],
             'Windows 8.1': ['11']
-        //},
-        //'chrome': {
-        //    'Windows 8.1': ['26..38', 'beta', 'dev']
+        },
+        'chrome': {
+            'Windows 8.1': ['26..38', 'beta', 'dev']
         }
     };
 

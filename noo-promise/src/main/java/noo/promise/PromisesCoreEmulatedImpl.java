@@ -13,4 +13,14 @@ class PromisesCoreEmulatedImpl extends PromisesCore {
     String getImplementationName() {
         return "emulated";
     }
+
+    @Override
+    <T> Promise<T> resolve(final T value) {
+        return create(new PromiseResolver<T>() {
+            @Override
+            public void resolve(PromiseCallback<T> callback) {
+                callback.resolve(PromiseOrValue.value(value));
+            }
+        });
+    }
 }

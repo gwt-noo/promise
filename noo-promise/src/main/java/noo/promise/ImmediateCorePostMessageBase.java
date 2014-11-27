@@ -34,11 +34,20 @@ class ImmediateCorePostMessageBase extends ImmediateCoreEmulatedBase {
 
     private native void addEventListener(JavaScriptObject window, String messagePrefix) /*-{
         var instance = this;
-        window.addEventListener('message', $entry(function (event) {
-            if (typeof event.data === "string" && event.data.indexOf(messagePrefix) === 0) {
-                instance.@noo.promise.ImmediateCorePostMessageBase::runIfPresent(Ljava/lang/String;)(event.data);
-            }
-        }))
+        if(window.addEventListener) {
+            window.addEventListener('message', $entry(function (event) {
+                if (typeof event.data === "string" && event.data.indexOf(messagePrefix) === 0) {
+                    instance.@noo.promise.ImmediateCorePostMessageBase::runIfPresent(Ljava/lang/String;)(event.data);
+                }
+            }));
+        } else if(window.attachEvent) {
+            window.attachEvent('onmessage', $entry(function (event) {
+                console.log('---',event)
+                if (typeof event.data === "string" && event.data.indexOf(messagePrefix) === 0) {
+                    instance.@noo.promise.ImmediateCorePostMessageBase::runIfPresent(Ljava/lang/String;)(event.data);
+                }
+            }));
+        }
     }-*/;
 
     private native static void postMessage(JavaScriptObject window, String message) /*-{
