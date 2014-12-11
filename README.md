@@ -50,6 +50,9 @@ compile(group: 'com.github.gwt-noo', name: 'noo-promise', version: 'VERSION')
 
 # Change log
 
+## 0.1.2
+ - Adding a JVM implementation to Immediate, for running inside JUnit
+
 ## 0.1.1
  - Changing the PromiseHandler utility method names to wrap*
  - Fixing wrapPromise to accept promise

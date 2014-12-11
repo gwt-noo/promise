@@ -57,7 +57,7 @@ runTestServer.dependsOn compileTestJava
 
 
 group = 'com.github.gwt-noo'
-def versionBase = '0.1.1'
+def versionBase = '0.1.2'
 version = versionBase //+ (project.hasProperty('release') ? '' : '-test')
 
 publishing {

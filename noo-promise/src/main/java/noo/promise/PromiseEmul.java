@@ -1,6 +1,10 @@
 package noo.promise;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Tal Shani
@@ -44,10 +48,14 @@ public class PromiseEmul<T> implements Promise<T> {
         }
     }
 
+    private static <T> HandlersCollection<T> createHandlersCollection() {
+        return GWT.isScript() ? NativeHandlersCollection.<T>create() : new JVMHandlersCollection<T>();
+    }
+
     private Throwable reason = null;
     private STATE state = STATE.PENDING;
-    private HandlersCollection<T> successSubscribers = HandlersCollection.create();
-    private HandlersCollection<Throwable> errorSubscribers = HandlersCollection.create();
+    private HandlersCollection<T> successSubscribers = PromiseEmul.createHandlersCollection();
+    private HandlersCollection<Throwable> errorSubscribers = PromiseEmul.createHandlersCollection();
     private T value = null;
     private final PromiseLoggingHelper logger = new PromiseLoggingHelper();
 
@@ -55,6 +63,7 @@ public class PromiseEmul<T> implements Promise<T> {
     public PromiseEmul(PromiseResolver<T> resolver) {
         doResolve(resolver);
     }
+
 
     @Override
     public Promise<T> then(final PromiseHandler<T> onFulfilled) {
@@ -266,13 +275,21 @@ public class PromiseEmul<T> implements Promise<T> {
         PENDING, FULFILLED, REJECTED;
     }
 
-    static final class HandlersCollection<T> extends JavaScriptObject {
+    static interface HandlersCollection<T> {
+        int length();
 
-        protected HandlersCollection() {
+        PromiseHandler<T> get(int i);
+
+        void push(PromiseHandler<T> handler);
+    }
+
+    static final class NativeHandlersCollection<T> extends JavaScriptObject implements HandlersCollection<T> {
+
+        protected NativeHandlersCollection() {
         }
 
 
-        public static <T> HandlersCollection<T> create() {
+        public static <T> NativeHandlersCollection<T> create() {
             return JavaScriptObject.createArray().cast();
         }
 
@@ -287,5 +304,22 @@ public class PromiseEmul<T> implements Promise<T> {
         public native void push(PromiseHandler<T> handler) /*-{
             this[this.length] = handler;
         }-*/;
+    }
+
+    static final class JVMHandlersCollection<T> implements HandlersCollection<T> {
+
+        private final List<PromiseHandler<T>> ar = new ArrayList<PromiseHandler<T>>();
+
+        public int length() {
+            return ar.size();
+        }
+
+        public PromiseHandler<T> get(int i) {
+            return ar.get(i);
+        }
+
+        public void push(PromiseHandler<T> handler) {
+            ar.set(ar.size(), handler);
+        }
     }
 }

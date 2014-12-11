@@ -2,14 +2,12 @@ package noo.promisetest;
 
 import com.google.gwt.core.client.Scheduler;
 import noo.promise.*;
-import noo.testing.jasmine.client.DescribeCallback;
 import noo.testing.jasmine.client.DoneCallback;
-import noo.testing.jasmine.client.JasmineCallback;
 import noo.testing.jasmine.client.rebind.BeforeEach;
 import noo.testing.jasmine.client.rebind.Describe;
 import noo.testing.jasmine.client.rebind.It;
 
-import static noo.testing.jasmine.client.Jasmine.*;
+import static noo.testing.jasmine.client.Jasmine.expect;
 
 /**
  * adapted from https://github.com/domenic/promises-unwrapping/blob/master/reference-implementation/test/queue-order.js
@@ -94,6 +92,7 @@ public class QueueOrderSpec {
         p1.then(new PromiseHandler<Object>() {
             @Override
             public void handle(Object value) {
+                expect(calls.length).toEqual(2);
                 expect(calls).toEqual(new double[]{1, 2});
                 done.execute();
             }
@@ -123,13 +122,15 @@ public class QueueOrderSpec {
                 });
 
                 // assertion and done
-                p1.then(new PromiseHandler<Object>() {
+                Scheduler.get().scheduleFixedDelay(new Scheduler.RepeatingCommand() {
                     @Override
-                    public void handle(Object value) {
+                    public boolean execute() {
+                        expect(calls.length).toEqual(2);
                         expect(calls).toEqual(new double[]{1, 2});
                         done.execute();
+                        return false;
                     }
-                });
+                }, 10);
                 return false;
             }
         }, 0);

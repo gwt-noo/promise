@@ -1,8 +1,8 @@
 package noo.promise;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.logging.client.LogConfiguration;
 
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,7 +13,7 @@ class PromiseLoggingHelper {
     private static final Logger LOG = Logger.getLogger("Promise");
     private static int ID = 1;
     private static int PROMISE_HELPER_ID = 0;
-    private static final boolean ENABLED = LogConfiguration.loggingIsEnabled(Level.FINER);
+    private static final boolean ENABLED = GWT.isClient() && LogConfiguration.loggingIsEnabled(Level.FINER);
 
     private final int id = ID++;
 
