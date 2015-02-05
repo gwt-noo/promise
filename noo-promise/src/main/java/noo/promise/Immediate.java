@@ -34,10 +34,20 @@ public final class Immediate {
 
     /**
      * Used by the JVM promise emulation to call all immediate(s) that were set
+     *
+     * @deprecated User {#flush}
      */
+    @Deprecated
     public static void exit() {
+        flush();
+    }
+
+    /**
+     * Used by the JVM promise emulation to call all immediate(s) that were set
+     */
+    public static void flush() {
         if (!GWT.isScript()) {
-            ImmediateCoreJVM.exit();
+            ImmediateCoreJVM.flush();
         }
     }
 

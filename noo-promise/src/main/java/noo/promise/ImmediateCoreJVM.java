@@ -45,7 +45,7 @@ final class ImmediateCoreJVM extends ImmediateCore {
      * Will call all commands that didn't execute till now
      * Usually will be called after the body of the test and before the assertions
      */
-    public static void exit() {
+    public static void flush() {
         while (currentIndex < COMMANDS.size()) {
             ImmediateCommand cmd = COMMANDS.get(currentIndex);
             try {

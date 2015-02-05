@@ -35,4 +35,11 @@ public class Promises {
     public static <T> PromiseOrValue<T> value(Promise<T> promise) {
         return PromiseOrValue.promise(promise);
     }
+
+    /**
+     * Used by the JVM promise emulation to call all immediate(s) that were set
+     */
+    public static void flush() {
+        Immediate.flush();
+    }
 }
