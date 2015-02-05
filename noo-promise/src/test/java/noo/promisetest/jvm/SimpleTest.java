@@ -32,7 +32,7 @@ public class SimpleTest {
                 memory.add(value);
             }
         });
-        Immediate.exit();
+        Promises.flush();
 
         assertEquals(1, memory.size());
         assertEquals(5, memory.get(0));
@@ -62,7 +62,7 @@ public class SimpleTest {
             }
         });
 
-        Immediate.exit();
+        Promises.flush();
 
         assertEquals(0, memory.size());
     }
@@ -82,7 +82,7 @@ public class SimpleTest {
             }
         });
 
-        Immediate.exit();
+        Promises.flush();
 
         assertEquals(2, memory.size());
     }
@@ -109,7 +109,7 @@ public class SimpleTest {
             }
         });
 
-        Immediate.exit();
+        Promises.flush();
 
         assertEquals(1, memory.size());
     }
