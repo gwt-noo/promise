@@ -45,5 +45,23 @@ public class ImmediateSimpleSpec {
         });
     }
 
+    @It("should run in a order of registration")
+    public void testSeveralImmediateOrder(final DoneCallback done) {
+        final PositionAssertion asserter = new PositionAssertion(2, done);
+        asserter.pos(0);
+        Immediate.setImmediate(new ImmediateCommand() {
+            @Override
+            public void execute() {
+                asserter.pos(1);
+            }
+        });
+        Immediate.setImmediate(new ImmediateCommand() {
+            @Override
+            public void execute() {
+                asserter.pos(2);
+            }
+        });
+    }
+
 
 }

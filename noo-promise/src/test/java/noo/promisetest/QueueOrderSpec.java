@@ -71,32 +71,30 @@ public class QueueOrderSpec {
 
     @It("should happen in the order they are queued, when added after resolution")
     public void order2(final DoneCallback done) {
+        final ItemsAssertion items = new ItemsAssertion(done, "p1", "p2");
         p2Callback.reject(null);
         p1Callback.resolve(null);
 
-        p1.then(new PromiseHandler<Object>() {
+        // we require order of execution on next stack
+        Immediate.set(new ImmediateCommand() {
             @Override
-            public void handle(Object value) {
-                calls[calls.length] = 1d;
+            public void execute() {
+                p1.then(new PromiseHandler<Object>() {
+                    @Override
+                    public void handle(Object value) {
+                        items.mark("p1");
+                    }
+                });
+
+                p2.catchIt(new PromiseHandler<Throwable>() {
+                    @Override
+                    public void handle(Throwable value) {
+                        items.mark("p2");
+                    }
+                });
             }
         });
 
-        p2.catchIt(new PromiseHandler<Throwable>() {
-            @Override
-            public void handle(Throwable value) {
-                calls[calls.length] = 2d;
-            }
-        });
-
-        // assertion and done
-        p1.then(new PromiseHandler<Object>() {
-            @Override
-            public void handle(Object value) {
-                expect(calls.length).toEqual(2);
-                expect(calls).toEqual(new double[]{1, 2});
-                done.execute();
-            }
-        });
     }
 
     @It("should happen in the order they are queued, when added asynchronously after resolution")
