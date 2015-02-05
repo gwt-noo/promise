@@ -20,11 +20,9 @@ public class QueueOrderSpec {
     public PromiseCallback<Object> p2Callback;
     Promise<Object> p1;
     Promise<Object> p2;
-    double[] calls = new double[0];
 
     @BeforeEach
     public void preparePromises() {
-        calls = new double[0];
         p1 = Promises.create(new PromiseResolver<Object>() {
             @Override
             public void resolve(PromiseCallback<Object> callback) {
@@ -41,27 +39,19 @@ public class QueueOrderSpec {
 
     @It("should happen in the order they are queued, when added before resolution")
     public void order1(final DoneCallback done) {
+        final ItemsAssertion items = new ItemsAssertion(done, "p1", "p2");
 
         p1.then(new PromiseHandler<Object>() {
             @Override
             public void handle(Object value) {
-                calls[calls.length] = 1d;
+                items.mark("p1");
             }
         });
 
         p2.catchIt(new PromiseHandler<Throwable>() {
             @Override
             public void handle(Throwable value) {
-                calls[calls.length] = 2d;
-            }
-        });
-
-        // assertion and done
-        p1.then(new PromiseHandler<Object>() {
-            @Override
-            public void handle(Object value) {
-                expect(calls).toEqual(new double[]{2, 1});
-                done.execute();
+                items.mark("p2");
             }
         });
 
@@ -75,7 +65,27 @@ public class QueueOrderSpec {
         p2Callback.reject(null);
         p1Callback.resolve(null);
 
-        // we require order of execution on next stack
+        p1.then(new PromiseHandler<Object>() {
+            @Override
+            public void handle(Object value) {
+                items.mark("p1");
+            }
+        });
+
+        p2.catchIt(new PromiseHandler<Throwable>() {
+            @Override
+            public void handle(Throwable value) {
+                items.mark("p2");
+            }
+        });
+    }
+
+    @It("should happen in the order they are queued, when added asynchronously after resolution")
+    public void order3(final DoneCallback done) {
+        final ItemsAssertion items = new ItemsAssertion(done, "p1", "p2");
+        p2Callback.reject(null);
+        p1Callback.resolve(null);
+
         Immediate.set(new ImmediateCommand() {
             @Override
             public void execute() {
@@ -94,43 +104,5 @@ public class QueueOrderSpec {
                 });
             }
         });
-
-    }
-
-    @It("should happen in the order they are queued, when added asynchronously after resolution")
-    public void order3(final DoneCallback done) {
-        p2Callback.reject(null);
-        p1Callback.resolve(null);
-
-        Scheduler.get().scheduleFixedDelay(new Scheduler.RepeatingCommand() {
-            @Override
-            public boolean execute() {
-                p1.then(new PromiseHandler<Object>() {
-                    @Override
-                    public void handle(Object value) {
-                        calls[calls.length] = 1d;
-                    }
-                });
-
-                p2.catchIt(new PromiseHandler<Throwable>() {
-                    @Override
-                    public void handle(Throwable value) {
-                        calls[calls.length] = 2d;
-                    }
-                });
-
-                // assertion and done
-                Scheduler.get().scheduleFixedDelay(new Scheduler.RepeatingCommand() {
-                    @Override
-                    public boolean execute() {
-                        expect(calls.length).toEqual(2);
-                        expect(calls).toEqual(new double[]{1, 2});
-                        done.execute();
-                        return false;
-                    }
-                }, 10);
-                return false;
-            }
-        }, 0);
     }
 }
