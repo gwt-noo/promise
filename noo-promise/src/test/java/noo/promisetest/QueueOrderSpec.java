@@ -56,14 +56,14 @@ public class QueueOrderSpec {
         });
 
         p2Callback.reject(null);
-        p1Callback.resolve(null);
+        p1Callback.resolveValue(null);
     }
 
     @It("should happen in the order they are queued, when added after resolution")
     public void order2(final DoneCallback done) {
         final ItemsAssertion items = new ItemsAssertion(done, "p1", "p2");
         p2Callback.reject(null);
-        p1Callback.resolve(null);
+        p1Callback.resolveValue(null);
 
         p1.then(new PromiseHandler<Object>() {
             @Override
@@ -84,7 +84,7 @@ public class QueueOrderSpec {
     public void order3(final DoneCallback done) {
         final ItemsAssertion items = new ItemsAssertion(done, "p1", "p2");
         p2Callback.reject(null);
-        p1Callback.resolve(null);
+        p1Callback.resolveValue(null);
 
         Immediate.set(new ImmediateCommand() {
             @Override

@@ -50,6 +50,13 @@ compile(group: 'com.github.gwt-noo', name: 'noo-promise', version: 'VERSION')
 
 # Change log
 
+## 0.2.1-RC1
+ - Implemented Promises.race, Promises.all
+ - Removing ValueOrPromise wrapper
+ - Cleaner API to listen to fulfillment and rejection -> then(fulfill handler, reject handler)
+ - More testing, Also fixed existing testing
+
+
 ## 0.1.2
  - Adding a JVM implementation to Immediate, for running inside JUnit
 

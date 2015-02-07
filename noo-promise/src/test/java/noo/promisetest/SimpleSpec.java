@@ -17,9 +17,21 @@ import static noo.testing.jasmine.client.Jasmine.*;
 @Describe("Simple Spec")
 public class SimpleSpec {
 
-    public Easy Easy() {return new Easy();}
-    public SelfResolutionErrors SelfResultion() {return new SelfResolutionErrors();}
-    public AbruptCompletion AbruptCompletion() {return new AbruptCompletion();}
+    public Easy Easy() {
+        return new Easy();
+    }
+
+    public SelfResolutionErrors SelfResultion() {
+        return new SelfResolutionErrors();
+    }
+
+    public AbruptCompletion AbruptCompletion() {
+        return new AbruptCompletion();
+    }
+
+    public Transformation Transformation() {
+        return new Transformation();
+    }
 
     @Describe("Easy-to-debug sanity check")
     public class Easy {
@@ -77,6 +89,7 @@ public class SimpleSpec {
     @Describe("An abrupt completion of the executor function")
     public class AbruptCompletion {
         private boolean exceptionWillBeThrown = false;
+
         @It("should result in a rejected promise")
         public void test(final DoneCallback done) {
             expect(new FunctionWrapper() {
@@ -94,6 +107,7 @@ public class SimpleSpec {
             expect(exceptionWillBeThrown).toBeTruthy();
             done.execute();
         }
+
         @It("should resolve if the promise was resolved before the exception")
         public void test2(final DoneCallback done) {
             expect(new FunctionWrapper() {
@@ -123,6 +137,33 @@ public class SimpleSpec {
                     });
                 }
             }).not().toThrow();
+        }
+    }
+
+    @Describe("Transforming a promise")
+    public class Transformation {
+        private boolean exceptionWillBeThrown = false;
+
+        @It("should result in a rejected promise")
+        public void test(final DoneCallback done) {
+            Promises.create(new PromiseResolver<Object>() {
+                @Override
+                public void resolve(PromiseCallback<Object> callback) {
+                    callback.reject(new RuntimeException("some error"));
+                }
+            }).then(new PromiseTransformingHandler<Object, Object>() {
+                @Override
+                public Promise<Object> handle(Object value) {
+                    expectFail();
+                    return null;
+                }
+            }).catchIt(new PromiseHandler<Throwable>() {
+                @Override
+                public void handle(Throwable value) {
+                    expectSuccess();
+                    done.execute();
+                }
+            });
         }
     }
 }

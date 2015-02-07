@@ -8,7 +8,9 @@ import noo.testing.jasmine.client.rebind.TestClasses;
  */
 @TestClasses({
         ImmediateSimpleSpec.class,
-        PromiseSimpleSpec.class
+        PromiseSimpleSpec.class,
+        PromiseAllSpec.class,
+        PromiseRaceSpec.class
 })
 public interface SpecRegistry extends JasmineTestRegistry {
 }

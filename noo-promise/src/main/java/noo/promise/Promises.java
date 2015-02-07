@@ -28,12 +28,12 @@ public class Promises {
         return IMPL.resolve(value);
     }
 
-    public static <T> PromiseOrValue<T> promiseAsValue(Promise<T> promise) {
-        return PromiseOrValue.promise(promise);
+    public static Promise<ResolvedCollection> all(Object... promises) {
+        return IMPL.all(promises);
     }
 
-    public static <T> PromiseOrValue<T> value(Promise<T> promise) {
-        return PromiseOrValue.promise(promise);
+    public static <T> Promise<T> race(Promise<? extends T>... promises) {
+        return IMPL.race(promises);
     }
 
     /**
@@ -41,5 +41,13 @@ public class Promises {
      */
     public static void flush() {
         Immediate.flush();
+    }
+
+    public static void setUncaughtExceptionHandler(GWT.UncaughtExceptionHandler exceptionHandler) {
+        IMPL.setUncaughtExceptionHandler(exceptionHandler);
+    }
+
+    public static GWT.UncaughtExceptionHandler getUncaughtExceptionHandler() {
+        return IMPL.getUncaughtExceptionHandler();
     }
 }

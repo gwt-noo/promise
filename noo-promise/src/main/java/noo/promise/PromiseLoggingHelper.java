@@ -64,4 +64,15 @@ class PromiseLoggingHelper {
         }
         return o.__PROMISE_HELPER_ID__;
     }-*/;
+
+    public void enterThen(Object fulfilled, Object reject) {
+        if (ENABLED) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("'Then' called with(");
+            if (fulfilled != null) sb.append(" success handler: " + getObjectId(fulfilled));
+            if (reject != null) sb.append(" error handler: " + getObjectId(reject));
+            sb.append(" )");
+            log(sb.toString());
+        }
+    }
 }

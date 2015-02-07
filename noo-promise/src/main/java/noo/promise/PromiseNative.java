@@ -5,11 +5,11 @@ import com.google.gwt.core.client.JavaScriptObject;
 /**
  * @author Tal Shani
  */
-public class PromiseNative<T> extends JavaScriptObject implements Promise<T> {
+final class PromiseNative<T> extends JavaScriptObject implements Promise<T> {
     protected PromiseNative() {
     }
 
-    public final native Promise<T> nativeThen(PromiseHandler<T> onFulfilled, PromiseHandler<Throwable> onRejected) /*-{
+    public final native Promise<T> nativeThen(PromiseHandler<? super T> onFulfilled, PromiseHandler<Throwable> onRejected) /*-{
         var onFulfilledFn, onRejectedFn;
         if (onFulfilled) {
             onFulfilledFn = $entry(function (value) {
@@ -50,8 +50,13 @@ public class PromiseNative<T> extends JavaScriptObject implements Promise<T> {
     }
 
     @Override
-    public final Promise<T> then(PromiseHandler<T> onFulfilled) {
+    public final Promise<T> then(PromiseHandler<? super T> onFulfilled) {
         return nativeThen(onFulfilled, null);
+    }
+
+    @Override
+    public Promise<T> then(PromiseHandler<? super T> onFulfilled, PromiseHandler<Throwable> onRejected) {
+        return nativeThen(onFulfilled, onRejected);
     }
 
     @Override
@@ -65,7 +70,7 @@ public class PromiseNative<T> extends JavaScriptObject implements Promise<T> {
     }
 
     @Override
-    public final <R> Promise<R> catchIt(PromiseTransformingHandler<R, Throwable> onRejected) {
+    public final Promise<T> catchIt(PromiseTransformingHandler<T, Throwable> onRejected) {
         return nativeThen(null, onRejected);
     }
 
@@ -88,12 +93,6 @@ public class PromiseNative<T> extends JavaScriptObject implements Promise<T> {
             var fn = this.@noo.promise.PromiseNative.NativeCallback::rejectFn;
             if (fn) fn(o);
         }-*/;
-
-        @Override
-        public void resolve(PromiseOrValue<T> value) {
-            if (value == null) nativeResolve(null);
-            else nativeResolve(value.getObject());
-        }
 
         @Override
         public void resolveValue(T value) {

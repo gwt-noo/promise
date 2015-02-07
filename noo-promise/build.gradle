@@ -16,7 +16,7 @@ repositories {
 gwt {
     gwtVersion = project.ext.gwtVersion
     minHeapSize = "512M";
-    maxHeapSize = "1024M";
+    maxHeapSize = "1g";
 }
 
 jar {
@@ -57,7 +57,7 @@ runTestServer.dependsOn compileTestJava
 
 
 group = 'com.github.gwt-noo'
-def versionBase = '0.1.2'
+def versionBase = '0.1.2-RC1'
 version = versionBase //+ (project.hasProperty('release') ? '' : '-test')
 
 publishing {

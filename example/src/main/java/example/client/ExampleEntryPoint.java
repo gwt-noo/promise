@@ -18,7 +18,7 @@ public class ExampleEntryPoint implements EntryPoint {
 
         Promise<Object> then = promise1.then(new PromiseTransformingHandler<Object, String>() {
             @Override
-            public PromiseOrValue<Object> handle(String value) {
+            public Promise<Object> handle(String value) {
                 return null;
             }
         });
